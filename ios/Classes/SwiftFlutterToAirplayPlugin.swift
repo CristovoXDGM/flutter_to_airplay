@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import AVFoundation
+import MediaPlayer
 
 public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   private var routeDetector: AVRouteDetector?
@@ -33,6 +34,9 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
       result(nil)
     case "isConnectedToAirplay":
       result(isConnectedToAirplay())
+    case "disconnectFromAirplay":
+      disconnectFromAirplay()
+      result(nil)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -40,7 +44,7 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   
   private func startMonitoringAirplayConnection() {
     routeDetector = AVRouteDetector()
-    routeDetector?.routeDetectionEnabled = true
+    routeDetector?.isRouteDetectionEnabled = true
     
     NotificationCenter.default.addObserver(
       self,
@@ -51,7 +55,7 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   }
   
   private func stopMonitoringAirplayConnection() {
-    routeDetector?.routeDetectionEnabled = false
+    routeDetector?.isRouteDetectionEnabled = false
     routeDetector = nil
     NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: nil)
   }
@@ -68,5 +72,26 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
       }
     }
     return false
+  }
+  
+  private func disconnectFromAirplay() {
+    // Método para desconectar do Airplay
+    do {
+      try AVAudioSession.sharedInstance().overrideOutputAudioPort(.none)
+      // Forçar a saída de áudio para o alto-falante interno
+      try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+      
+      // Também podemos usar MPVolumeView para desconectar
+      if let volumeView = MPVolumeView() {
+        for view in volumeView.subviews {
+          if let button = view as? UIButton {
+            button.sendActions(for: .touchUpInside)
+            break
+          }
+        }
+      }
+    } catch {
+      print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
+    }
   }
 }

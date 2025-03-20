@@ -23,4 +23,8 @@ class AirplayConnectionManager {
   static Future<bool> isConnectedToAirplay() async {
     return await _channel.invokeMethod('isConnectedToAirplay');
   }
+
+  static Future<void> disconnectFromAirplay() async {
+    await _channel.invokeMethod('disconnectFromAirplay');
+  }
 }
