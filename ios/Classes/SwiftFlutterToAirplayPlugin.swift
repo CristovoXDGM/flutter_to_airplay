@@ -82,25 +82,11 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   }
   
   private func disconnectFromAirplay() {
+    let audioSession = AVAudioSession.sharedInstance()
     do {
-        // Enviar notificação para pausar todos os players
-        NotificationCenter.default.post(name: NSNotification.Name("PauseAllPlayers"), object: nil)
-        
-        // Desativar a sessão de áudio
-        let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
-        
-        // Reconfigurar a sessão de áudio
-        try audioSession.setCategory(.playback, mode: .default)
+        try audioSession.setCategory(.playback, mode: .default, options: [])
         try audioSession.setActive(true)
-        try audioSession.overrideOutputAudioPort(.speaker)
-        
-        // Forçar a atualização do sistema de rotas de áudio
-        MPMusicPlayerController.systemMusicPlayer.stop()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.channel?.invokeMethod("onAirplayConnectionChanged", arguments: ["connected": self.isConnectedToAirplay()])
-        }
+        print("Desconectado do Airplay com sucesso!")
     } catch {
         print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
     }
