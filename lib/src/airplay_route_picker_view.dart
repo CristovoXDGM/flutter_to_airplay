@@ -137,7 +137,7 @@ class _AirPlayRoutePickerViewState extends State<AirPlayRoutePickerView> {
           creationParams: widget._createParams(),
           onPlatformViewCreated: _onPlatformViewCreated,
         ),
-      ), title,],);
+      ), widget.title,],);
     } else {
       // if the platform is not iOS, it should return a centered text widget to give the message.
       return Center(
