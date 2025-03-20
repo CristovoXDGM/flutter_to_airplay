@@ -75,12 +75,20 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   }
   
   private func disconnectFromAirplay() {
+  // Método para desconectar do Airplay
   do {
+    try AVAudioSession.sharedInstance().overrideOutputAudioPort(.none)
+    // Forçar a saída de áudio para o alto-falante interno
     try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
     
-    let audioSession = AVAudioSession.sharedInstance()
-    try audioSession.setActive(false)
-    try audioSession.setActive(true)
+    // Corrigindo o uso do MPVolumeView
+    let volumeView = MPVolumeView()
+    for view in volumeView.subviews {
+      if let button = view as? UIButton {
+        button.sendActions(for: .touchUpInside)
+        break
+      }
+    }
   } catch {
     print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
   }
