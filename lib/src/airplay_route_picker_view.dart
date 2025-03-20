@@ -18,7 +18,7 @@ class AirPlayRoutePickerView extends StatefulWidget {
     this.width = 44.0,
     this.onShowPickerView,
     this.onClosePickerView,
-    this.title = Container(),
+    this.title,
   }) : super(key: key);
 
   /// Whether or not the route picker should sort video capable output devices to the top of the list.
@@ -54,7 +54,7 @@ class AirPlayRoutePickerView extends StatefulWidget {
   /// The route picker view will finished presenting routes to the user.
   final VoidCallback? onClosePickerView;
 
-  final Widget title;
+  final Widget? title;
 
   /// This function checks the presence of all the option attribute,
   /// and only packs the ones available. That helps the error handling
@@ -66,7 +66,8 @@ class AirPlayRoutePickerView extends StatefulWidget {
       'prioritizesVideoDevices': prioritizesVideoDevices,
 
       // if tintColor is not provided, do not process this.
-      if (tintColor != null) 'tintColor': FlutterToAirplay.colorToParams(tintColor!),
+      if (tintColor != null)
+        'tintColor': FlutterToAirplay.colorToParams(tintColor!),
 
       // if activeTintColor is not provided, do not process this.
       if (activeTintColor != null)
@@ -125,19 +126,24 @@ class _AirPlayRoutePickerViewState extends State<AirPlayRoutePickerView> {
   Widget build(BuildContext context) {
     // This widget supports only iOS for now, so here we are checking this explicitly.
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return Row(children: [ SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: UiKitView(
-          // This is the identifier that helps distinguish different views in the native code.
-          viewType: 'airplay_route_picker_view',
-          // messenger to decode message between flutter and native.
-          creationParamsCodec: const StandardMessageCodec(),
-          // parameters to load the video in native code.
-          creationParams: widget._createParams(),
-          onPlatformViewCreated: _onPlatformViewCreated,
-        ),
-      ), widget.title,],);
+      return Row(
+        children: [
+          SizedBox(
+            width: widget.width,
+            height: widget.height,
+            child: UiKitView(
+              // This is the identifier that helps distinguish different views in the native code.
+              viewType: 'airplay_route_picker_view',
+              // messenger to decode message between flutter and native.
+              creationParamsCodec: const StandardMessageCodec(),
+              // parameters to load the video in native code.
+              creationParams: widget._createParams(),
+              onPlatformViewCreated: _onPlatformViewCreated,
+            ),
+          ),
+          if (widget.title != null) widget.title!,
+        ],
+      );
     } else {
       // if the platform is not iOS, it should return a centered text widget to give the message.
       return Center(
