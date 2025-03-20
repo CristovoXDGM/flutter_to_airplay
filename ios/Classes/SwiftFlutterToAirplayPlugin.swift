@@ -81,11 +81,17 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
     return false
   }
   
-  private func disconnectFromAirplay() {
+   private func disconnectFromAirplay() {
     let audioSession = AVAudioSession.sharedInstance()
     do {
         try audioSession.setCategory(.playback, mode: .default, options: [])
         try audioSession.setActive(true)
+
+        let outputOverride = AVAudioSession.PortOverride.none
+        try audioSession.overrideOutputAudioPort(outputOverride)
+
+        let route = AVRouteDetector()
+        route.isRouteDetectionEnabled = false
         print("Desconectado do Airplay com sucesso!")
     } catch {
         print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
