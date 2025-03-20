@@ -18,6 +18,7 @@ class AirPlayRoutePickerView extends StatefulWidget {
     this.width = 44.0,
     this.onShowPickerView,
     this.onClosePickerView,
+    this.title,
   }) : super(key: key);
 
   /// Whether or not the route picker should sort video capable output devices to the top of the list.
@@ -52,6 +53,8 @@ class AirPlayRoutePickerView extends StatefulWidget {
 
   /// The route picker view will finished presenting routes to the user.
   final VoidCallback? onClosePickerView;
+
+  final Widget? title;
 
   /// This function checks the presence of all the option attribute,
   /// and only packs the ones available. That helps the error handling
@@ -122,7 +125,7 @@ class _AirPlayRoutePickerViewState extends State<AirPlayRoutePickerView> {
   Widget build(BuildContext context) {
     // This widget supports only iOS for now, so here we are checking this explicitly.
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return SizedBox(
+      return Row(children: [ SizedBox(
         width: widget.width,
         height: widget.height,
         child: UiKitView(
@@ -134,7 +137,7 @@ class _AirPlayRoutePickerViewState extends State<AirPlayRoutePickerView> {
           creationParams: widget._createParams(),
           onPlatformViewCreated: _onPlatformViewCreated,
         ),
-      );
+      ), title,],);
     } else {
       // if the platform is not iOS, it should return a centered text widget to give the message.
       return Center(
