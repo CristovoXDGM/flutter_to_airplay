@@ -18,7 +18,7 @@ class AirPlayRoutePickerView extends StatefulWidget {
     this.width = 44.0,
     this.onShowPickerView,
     this.onClosePickerView,
-    this.title,
+    this.title = Container(),
   }) : super(key: key);
 
   /// Whether or not the route picker should sort video capable output devices to the top of the list.
@@ -54,7 +54,7 @@ class AirPlayRoutePickerView extends StatefulWidget {
   /// The route picker view will finished presenting routes to the user.
   final VoidCallback? onClosePickerView;
 
-  final Widget? title;
+  final Widget title;
 
   /// This function checks the presence of all the option attribute,
   /// and only packs the ones available. That helps the error handling
