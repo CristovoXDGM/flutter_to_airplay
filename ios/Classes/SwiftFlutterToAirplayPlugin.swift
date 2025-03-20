@@ -84,8 +84,8 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
    private func disconnectFromAirplay() {
     let audioSession = AVAudioSession.sharedInstance()
     do {
-        try audioSession.setCategory(.playback, mode: .default, options: [])
-        try audioSession.setActive(true)
+        try audioSession.setCategory(.playback, mode: .defaultToSpeaker)
+        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
         let outputOverride = AVAudioSession.PortOverride.none
         try audioSession.overrideOutputAudioPort(outputOverride)
