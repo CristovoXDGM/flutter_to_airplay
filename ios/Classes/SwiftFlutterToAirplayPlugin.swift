@@ -6,6 +6,13 @@ import MediaPlayer
 public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   private var routeDetector: AVRouteDetector?
   private var channel: FlutterMethodChannel?
+  // Referência para o player atual
+  private static var currentPlayer: AVPlayer?
+  
+  // Método para registrar o player atual
+  public static func registerCurrentPlayer(_ player: AVPlayer) {
+    currentPlayer = player
+  }
   
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_to_airplay", binaryMessenger: registrar.messenger())
@@ -75,23 +82,27 @@ public class SwiftFlutterToAirplayPlugin: NSObject, FlutterPlugin {
   }
   
   private func disconnectFromAirplay() {
-  // Método para desconectar do Airplay
-  do {
-    try AVAudioSession.sharedInstance().overrideOutputAudioPort(.none)
-    // Forçar a saída de áudio para o alto-falante interno
-    try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
-    
-    // Corrigindo o uso do MPVolumeView
-    let volumeView = MPVolumeView()
-    for view in volumeView.subviews {
-      if let button = view as? UIButton {
-        button.sendActions(for: .touchUpInside)
-        break
-      }
+    do {
+        // Enviar notificação para pausar todos os players
+        NotificationCenter.default.post(name: NSNotification.Name("PauseAllPlayers"), object: nil)
+        
+        // Desativar a sessão de áudio
+        let audioSession = AVAudioSession.sharedInstance()
+        try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+        
+        // Reconfigurar a sessão de áudio
+        try audioSession.setCategory(.playback, mode: .default)
+        try audioSession.setActive(true)
+        try audioSession.overrideOutputAudioPort(.speaker)
+        
+        // Forçar a atualização do sistema de rotas de áudio
+        MPMusicPlayerController.systemMusicPlayer.stop()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.channel?.invokeMethod("onAirplayConnectionChanged", arguments: ["connected": self.isConnectedToAirplay()])
+        }
+    } catch {
+        print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
     }
-  } catch {
-    print("Erro ao desconectar do Airplay: \(error.localizedDescription)")
   }
-}
-
 }

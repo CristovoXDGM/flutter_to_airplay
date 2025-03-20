@@ -35,11 +35,25 @@ class FlutterAVPlayer: NSObject, FlutterPlatformView {
                 _flutterAVPlayerViewController.player = AVPlayer(playerItem: item)
             }
         }
+        let player = AVPlayer(playerItem: item)
+        SwiftFlutterToAirplayPlugin.registerCurrentPlayer(player)
         _flutterAVPlayerViewController.player!.play()
     }
-    func view() -> UIView {
+    func view()() UIView {
         return _flutterAVPlayerViewController.view;
     }
     
+    NotificationCenter.default.addObserver(self, 
+                                      selector: #selector(pausePlayer), 
+                                      name: NSNotification.Name("PauseAllPlayers"), 
+                                      object: nil)
+    
+    @objc func pausePlayer() {
+        player?.pause()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 
