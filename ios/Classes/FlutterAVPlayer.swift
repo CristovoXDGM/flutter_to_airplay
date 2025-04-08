@@ -35,6 +35,13 @@ class FlutterAVPlayer: NSObject, FlutterPlatformView {
                 _flutterAVPlayerViewController.player = AVPlayer(playerItem: item)
             }
         }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("✅ AVAudioSession ativada com sucesso.")
+        } catch {
+            print("⚠️ Failed to set audio session category: \(error)")
+        }
         _flutterAVPlayerViewController.player!.play()
     }
     func view() -> UIView {
